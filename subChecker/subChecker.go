@@ -56,7 +56,7 @@ func NewSubChecker(host string) *SubChecker {
 
 func (s *SubChecker) CheckToken(token string, jwt string, apiName string) error {
 	req, err := http.NewRequest(
-		http.MethodGet, fmt.Sprintf("https://%s%s", s.host, checkRoute), nil)
+		http.MethodGet, fmt.Sprintf("%s%s", s.host, checkRoute), nil)
 
 	if err != nil {
 		return err
