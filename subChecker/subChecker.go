@@ -11,7 +11,6 @@ import (
 )
 
 var checkRoute = "/subs"
-var authRoute = "/profile/auth/jwt"
 
 type checkResponse struct {
 	Status bool
@@ -54,7 +53,7 @@ func NewSubChecker(host string) *SubChecker {
 	}
 }
 
-func (s *SubChecker) CheckToken(token string, jwt string, apiName string) error {
+func (s *SubChecker) CheckToken(token string, apiName string) error {
 	req, err := http.NewRequest(
 		http.MethodGet, fmt.Sprintf("%s%s", s.host, checkRoute), nil)
 
@@ -65,9 +64,6 @@ func (s *SubChecker) CheckToken(token string, jwt string, apiName string) error 
 	q, _ := url.ParseQuery(req.URL.RawQuery)
 	q.Add("accessToken", token)
 	req.URL.RawQuery = q.Encode()
-
-
-	req.Header.Add("Authorization", jwt)
 
 	resp, err := s.client.Do(req)
 	if err != nil {
