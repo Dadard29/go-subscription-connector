@@ -53,12 +53,12 @@ func NewSubChecker(host string) *SubChecker {
 	}
 }
 
-func (s *SubChecker) CheckToken(token string, apiName string) error {
+func (s *SubChecker) CheckToken(token string, apiName string) (string, error) {
 	req, err := http.NewRequest(
 		http.MethodGet, fmt.Sprintf("%s%s", s.host, checkRoute), nil)
 
 	if err != nil {
-		return err
+		return "error creating request", err
 	}
 
 	q, _ := url.ParseQuery(req.URL.RawQuery)
@@ -67,7 +67,7 @@ func (s *SubChecker) CheckToken(token string, apiName string) error {
 
 	resp, err := s.client.Do(req)
 	if err != nil {
-		return err
+		return "error processing request", err
 	}
 
 	var r checkResponse
@@ -76,18 +76,19 @@ func (s *SubChecker) CheckToken(token string, apiName string) error {
 
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		return err
+		return "failed to deserialize response body", err
 	}
 
 	if r.Status {
 		rApiName := r.Content.Api.Name
 		if rApiName != apiName {
-			return errors.New("bad api name")
+			msg := "bad api name"
+			return msg, errors.New(msg)
 		} else {
-			return nil
+			return "sub checked", nil
 		}
 	}
 
-	return errors.New(r.Message)
+	return r.Message, errors.New(r.Message)
 
 }
